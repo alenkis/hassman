@@ -7,11 +7,11 @@ cabal-version: 1.12
 name:           hassman
 version:        0.1.0.0
 description:    Please see the README on GitHub at <https://github.com/githubuser/hassman#readme>
-homepage:       https://github.com/githubuser/hassman#readme
-bug-reports:    https://github.com/githubuser/hassman/issues
-author:         Author name here
-maintainer:     example@example.com
-copyright:      2022 Author name here
+homepage:       https://github.com/alenkis/hassman#readme
+bug-reports:    https://github.com/alenkis/hassman/issues
+author:         Alen Kis
+maintainer:     alen@alenkis.com
+copyright:      2022 Alen Kis
 license:        BSD3
 license-file:   LICENSE
 build-type:     Simple
@@ -21,10 +21,11 @@ extra-source-files:
 
 source-repository head
   type: git
-  location: https://github.com/githubuser/hassman
+  location: https://github.com/alenkis/hassman
 
 library
   exposed-modules:
+      Cli
       Lib
   other-modules:
       Paths_hassman
@@ -32,9 +33,10 @@ library
       src
   build-depends:
       base >=4.7 && <5
+    , optparse-applicative
   default-language: Haskell2010
 
-executable hassman-exe
+executable hassman
   main-is: Main.hs
   other-modules:
       Paths_hassman
@@ -44,6 +46,7 @@ executable hassman-exe
   build-depends:
       base >=4.7 && <5
     , hassman
+    , optparse-applicative
   default-language: Haskell2010
 
 test-suite hassman-test
@@ -57,4 +60,5 @@ test-suite hassman-test
   build-depends:
       base >=4.7 && <5
     , hassman
+    , optparse-applicative
   default-language: Haskell2010
