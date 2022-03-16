@@ -13,10 +13,12 @@ type Domain = String
 
 type Username = String
 
-data Command = Create | List
+data Command = Create | Copy
   deriving (Eq, Show)
 
-data Options = Options Domain Username (Maybe Command)
+data Input
+  = Options Domain Username (Maybe Command)
+  | List
   deriving (Eq, Show)
 
 domainP :: Parser Domain
@@ -35,19 +37,23 @@ usernameP =
       <> metavar "USERNAME"
       <> help "Password username"
 
-flagP :: Parser (Maybe Command)
-flagP =
-  flag Nothing (Just Create) (short 'c' <> long "create")
-    <|> flag Nothing (Just List) (short 'l' <> long "list")
+commandFlagP :: Parser (Maybe Command)
+commandFlagP = flag (Just Copy) (Just Create) (short 'c' <> long "create")
 
-parseOpts :: Parser Options
-parseOpts = Options <$> domainP <*> usernameP <*> flagP
+optionsP :: Parser Input
+optionsP = Options <$> domainP <*> usernameP <*> commandFlagP
 
-getCliCommand :: IO Options
+listPasswordsP :: Parser Input
+listPasswordsP = flag' List (short 'l' <> long "list" <> help "List all passwords")
+
+input :: Parser Input
+input = optionsP <|> listPasswordsP
+
+getCliCommand :: IO Input
 getCliCommand =
   execParser
     ( info
-        (helper <*> versionOption <*> parseOpts)
+        (helper <*> versionOption <*> input)
         (header version <> fullDesc)
     )
   where

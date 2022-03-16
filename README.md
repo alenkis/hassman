@@ -6,7 +6,7 @@ _Password manager that kicks ass!_
 
 ## Usage
 
-### Read
+### Read password for domain
 
 Copy password for a given `domain` and `username` to clipboard.
 
@@ -14,7 +14,7 @@ Copy password for a given `domain` and `username` to clipboard.
 hassman -d domain.com -u username
 ```
 
-### Create
+### Create password for domain
 
 Create a password for a `domain` and `username`
 
@@ -26,4 +26,10 @@ or
 
 ```sh
 hassman -d domain.com -u username -c
+```
+
+### List all passwords
+
+```sh
+hassman --list
 ```
