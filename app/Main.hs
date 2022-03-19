@@ -10,7 +10,6 @@ main :: IO ()
 main =
   getCliCommand >>= \case
     (Options domain username flag) -> case flag of
-      Just Create -> putStrLn $ "create password for domain " ++ domain ++ " and username " ++ username
-      Just Copy -> putStrLn $ "copy password for domain " ++ domain ++ " and username " ++ username
-      _ -> error "hmm..."
+      Create -> putStrLn $ "create password for domain " ++ domain ++ " and username " ++ username
+      Copy -> putStrLn $ "copy password for domain " ++ domain ++ " and username " ++ username
     List -> putStrLn "list all passwords"

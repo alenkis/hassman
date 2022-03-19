@@ -17,7 +17,7 @@ data Command = Create | Copy
   deriving (Eq, Show)
 
 data Input
-  = Options Domain Username (Maybe Command)
+  = Options Domain Username Command
   | List
   deriving (Eq, Show)
 
@@ -37,8 +37,8 @@ usernameP =
       <> metavar "USERNAME"
       <> help "Password username"
 
-commandFlagP :: Parser (Maybe Command)
-commandFlagP = flag (Just Copy) (Just Create) (short 'c' <> long "create")
+commandFlagP :: Parser Command
+commandFlagP = flag Copy Create (short 'c' <> long "create")
 
 optionsP :: Parser Input
 optionsP = Options <$> domainP <*> usernameP <*> commandFlagP
