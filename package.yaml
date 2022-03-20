@@ -27,6 +27,10 @@ dependencies:
   - persistent-template
   - text
   - Hclip
+  - pwstore-fast
+  - elocrypt
+  - random
+  - time
 
 library:
   source-dirs: src
