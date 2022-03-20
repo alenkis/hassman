@@ -1,5 +1,8 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module Cli where
 
+import           Data.Text
 import           Options.Applicative         (Parser, command, execParser, flag,
                                               fullDesc, header, help, helper,
                                               info, infoOption, long, metavar,
@@ -7,9 +10,9 @@ import           Options.Applicative         (Parser, command, execParser, flag,
                                               (<|>))
 import           Options.Applicative.Builder (flag')
 
-type Domain = String
+type Domain = Text
 
-type Username = String
+type Username = Text
 
 data Command = Create | Copy
   deriving (Eq, Show)
@@ -17,6 +20,7 @@ data Command = Create | Copy
 data Input
   = Options Domain Username Command
   | List
+  | Init
   deriving (Eq, Show)
 
 domainP :: Parser Domain
@@ -44,8 +48,11 @@ optionsP = Options <$> domainP <*> usernameP <*> commandFlagP
 listPasswordsP :: Parser Input
 listPasswordsP = flag' List (short 'l' <> long "list" <> help "List all passwords")
 
+initP :: Parser Input
+initP = flag' Init (short 'i' <> long "init" <> help "Initialise hassman")
+
 input :: Parser Input
-input = optionsP <|> listPasswordsP
+input = optionsP <|> listPasswordsP <|> initP
 
 getCliCommand :: IO Input
 getCliCommand =
