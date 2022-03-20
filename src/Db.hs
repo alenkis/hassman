@@ -30,8 +30,8 @@ share
   ]
   [persistLowerCase|
 Password
-    url String
-    Domain url
+    domain String
+    Domain domain
     username String
     password String
     deriving Show
@@ -40,18 +40,22 @@ Password
 dbName :: Text
 dbName = "db:memory"
 
-createPassword :: String -> String -> String -> IO ()
-createPassword url username password = runSqlite dbName $ do
+migrateDb :: IO ()
+migrateDb = runSqlite dbName $ do
   runMigration migrateAll
-  pId <- insert $ Password url username password
+  pure ()
+
+-- TODO: hash password
+createPassword :: String -> String -> String -> IO ()
+createPassword domain username password = runSqlite dbName $ do
+  pId <- insert $ Password domain username password
   p <- get pId
   case p of
     Nothing -> error "Something went wrong"
-    Just _ -> liftIO $ print $ "Successfully added password for domain: " ++ url
+    Just _ -> liftIO $ print $ "Successfully added password for domain: " ++ domain
 
 getPassword :: String -> String -> IO ()
 getPassword domain username = runSqlite dbName $ do
-  runMigration migrateAll
   password <- getBy $ Domain domain
   liftIO $ case password of
     Nothing -> print "Could not find password."
@@ -61,6 +65,5 @@ getPassword domain username = runSqlite dbName $ do
 
 listPasswords :: IO ()
 listPasswords = runSqlite dbName $ do
-  runMigration migrateAll
   entries <- selectList [] [Desc PasswordId]
   liftIO $ print entries
