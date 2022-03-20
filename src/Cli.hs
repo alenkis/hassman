@@ -1,5 +1,3 @@
-{-# LANGUAGE LambdaCase #-}
-
 module Cli where
 
 import           Options.Applicative         (Parser, command, execParser, flag,
