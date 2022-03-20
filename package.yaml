@@ -26,6 +26,7 @@ dependencies:
   - persistent-sqlite
   - persistent-template
   - text
+  - Hclip
 
 library:
   source-dirs: src

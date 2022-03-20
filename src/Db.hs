@@ -22,6 +22,7 @@ import           Data.Text
 import           Database.Persist
 import           Database.Persist.Sqlite
 import           Database.Persist.TH
+import           System.Hclip
 
 share
   [ mkMigrate "migrateAll",
@@ -52,9 +53,11 @@ getPassword :: String -> String -> IO ()
 getPassword domain username = runSqlite dbName $ do
   runMigration migrateAll
   password <- getBy $ Domain domain
-  case password of
-    Nothing -> liftIO $ print $ "Could not find password for domain: " ++ domain
-    Just p -> liftIO $ print $ "password: " ++ show (passwordPassword $ entityVal p)
+  liftIO $ case password of
+    Nothing -> print "Could not find password."
+    Just p -> do
+      setClipboard (passwordPassword $ entityVal p)
+      print "Copied password to clipboard."
 
 listPasswords :: IO ()
 listPasswords = runSqlite dbName $ do
