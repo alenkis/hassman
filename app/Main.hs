@@ -3,10 +3,16 @@
 
 module Main where
 
-import           Cli
+import           Cli                    (Command (Copy, Create),
+                                         Input (Init, List, Options),
+                                         getCliCommand)
 import           Control.Monad.IO.Class (MonadIO (liftIO))
-import           Data.Text
-import           Db
+import           Data.Text              ()
+import           Db                     (Verify (Missing, NonVerified, Verified),
+                                         copyPassword, getSensitiveData,
+                                         listPasswords, migrateDb,
+                                         storePassword, storeSecretKey,
+                                         verifySecret)
 
 main :: IO ()
 main = do

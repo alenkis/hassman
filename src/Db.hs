@@ -21,19 +21,26 @@ import           Control.Exception       (bracket_)
 import           Control.Monad           (liftM)
 import           Control.Monad.IO.Class  (MonadIO, liftIO)
 import qualified Crypto.PasswordStore    as PS
-import           Crypto.TripleSec
+import           Crypto.TripleSec        (CanTripleSecDecrypt (decrypt),
+                                          encryptIO, runTripleSecDecryptM)
 import           Data.ByteString         (ByteString)
 import qualified Data.ByteString.Char8   as Char8
 import           Data.Elocrypt           (genCapitals, genDigits, genOptions,
                                           genPassword, genSpecials)
-import           Data.Maybe
-import           Data.Text
+import           Data.Maybe              (listToMaybe)
+import           Data.Text               (Text, pack, unpack)
 import           Data.Text.Encoding      (decodeUtf8, encodeUtf8)
-import           Data.Time
-import           Database.Persist
-import           Database.Persist.Sqlite
-import           Database.Persist.TH
-import           System.Hclip
+import           Data.Time               (UTCTime, getCurrentTime)
+import           Database.Persist        (Entity (entityVal),
+                                          PersistStoreRead (get),
+                                          PersistStoreWrite (insert),
+                                          PersistUniqueRead (getBy),
+                                          SelectOpt (Desc), selectList)
+import           Database.Persist.Sqlite (BackendKey (SqlBackendKey),
+                                          runMigration, runSqlite)
+import           Database.Persist.TH     (mkMigrate, mkPersist,
+                                          persistLowerCase, share, sqlSettings)
+import           System.Hclip            (setClipboard)
 import           System.IO               (hFlush, hGetEcho, hSetEcho, stdin,
                                           stdout)
 import           System.Random           (RandomGen, StdGen, getStdGen)
