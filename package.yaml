@@ -33,6 +33,7 @@ dependencies:
   - time
   - bytestring
   - triplesec
+  - pretty-terminal
 
 library:
   source-dirs: src

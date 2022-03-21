@@ -27,6 +27,7 @@ library
   exposed-modules:
       Cli
       Db
+      Theme
   other-modules:
       Paths_hassman
   hs-source-dirs:
@@ -40,6 +41,7 @@ library
     , persistent
     , persistent-sqlite
     , persistent-template
+    , pretty-terminal
     , pwstore-fast
     , random
     , text
@@ -64,6 +66,7 @@ executable hassman
     , persistent
     , persistent-sqlite
     , persistent-template
+    , pretty-terminal
     , pwstore-fast
     , random
     , text
@@ -89,6 +92,7 @@ test-suite hassman-test
     , persistent
     , persistent-sqlite
     , persistent-template
+    , pretty-terminal
     , pwstore-fast
     , random
     , text

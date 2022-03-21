@@ -8,24 +8,25 @@ import           Cli                    (Command (Copy, Create),
                                          getCliCommand)
 import           Control.Monad.IO.Class (MonadIO (liftIO))
 import           Data.Text              ()
-import           Db                     (Verify (Missing, NonVerified, Verified),
+import           Db                     (SecretState (Missing, NonVerified, Verified),
                                          copyPassword, getSensitiveData,
                                          listPasswords, migrateDb,
                                          storePassword, storeSecretKey,
                                          verifySecret)
+import qualified Theme
 
 main :: IO ()
 main = do
   migrateDb
   getCliCommand >>= \case
     Init -> do
-      sk <- getSensitiveData "Secret key: "
+      sk <- getSensitiveData $ Theme.info "Secret key: "
       storeSecretKey sk
     List -> listPasswords
     (Options domain username flag) -> do
       getSensitiveData "Secret key: " >>= verifySecret >>= \case
-        Missing -> error "Make sure to initialize with --init"
-        NonVerified -> error "Secret key incorrect"
+        Missing -> putStrLn (Theme.danger "Make sure to initialize with" ++ Theme.info " --init")
+        NonVerified -> putStrLn $ Theme.danger "Secret key incorrect"
         Verified secret -> case flag of
           Create -> storePassword domain username secret
           Copy   -> copyPassword domain username secret

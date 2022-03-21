@@ -37,13 +37,15 @@ import           Database.Persist        (Entity (entityVal),
                                           PersistUniqueRead (getBy),
                                           SelectOpt (Desc), selectList)
 import           Database.Persist.Sqlite (BackendKey (SqlBackendKey),
-                                          runMigration, runSqlite)
+                                          runMigrationSilent, runSqlite)
 import           Database.Persist.TH     (mkMigrate, mkPersist,
                                           persistLowerCase, share, sqlSettings)
+import           System.Console.Pretty   (Color (Yellow), color)
 import           System.Hclip            (setClipboard)
 import           System.IO               (hFlush, hGetEcho, hSetEcho, stdin,
                                           stdout)
 import           System.Random           (RandomGen, StdGen, getStdGen)
+import qualified Theme
 
 share
   [ mkMigrate "migrateAll",
@@ -66,7 +68,7 @@ dbName = "db:memory"
 
 migrateDb :: IO ()
 migrateDb = runSqlite dbName $ do
-  runMigration migrateAll
+  runMigrationSilent migrateAll
   pure ()
 
 -- | Generates a random password with length `lng` and containing capitals, digits
@@ -87,7 +89,7 @@ storePassword domain username secret = runSqlite dbName $ do
   password <- get passId
   case password of
     Nothing -> error "Something went wrong with storing password."
-    Just _ -> liftIO $ print $ "Successfully added password for domain: " ++ unpack domain
+    Just _ -> liftIO $ putStrLn (Theme.success "Successfully added password for domain: " ++ Theme.info (unpack domain))
 
 -- | Prompts for sensitive text and hides any input.
 getSensitiveData :: Text -> IO Text
@@ -127,7 +129,7 @@ storeSecretKey secretKey = runSqlite dbName $ do
   time <- liftIO getCurrentTime
   hashedPassword <- liftIO $ PS.makePassword (encodeUtf8 secretKey) 14
   insert $ User (decodeUtf8 hashedPassword) time
-  liftIO $ print "Successfully stored secret key."
+  liftIO $ putStrLn $ Theme.success "Successfully stored secret key."
 
 -- | Try to retrieve a password for `domain`/`username` combination and if successful,
 -- copy password to clipoard.
@@ -135,19 +137,24 @@ copyPassword :: Text -> Text -> Text -> IO ()
 copyPassword domain username secret = runSqlite dbName $ do
   maybePasswordEntity <- getBy $ Domain domain
   liftIO $ case maybePasswordEntity of
-    Nothing -> print "Could not find password."
+    Nothing -> putStrLn $ Theme.danger "Could not find password."
     Just p -> do
       case decrypted of
-        Left ex -> print $ "Could not decrypt password: " ++ show ex
+        Left ex -> putStrLn (Theme.danger "Could not decrypt password: " ++ Theme.info (show ex))
         Right password -> do
           -- Copy decrypted password to clipboard
           setClipboard (unpack $ decodeUtf8 password)
-          print "Copied password to clipboard."
+          putStrLn $ Theme.success "Copied password to clipboard."
       where
         passwordValue = passwordPassword $ entityVal p
         decrypted = runTripleSecDecryptM $ decrypt (encodeUtf8 secret) passwordValue
 
 listPasswords :: IO ()
 listPasswords = runSqlite dbName $ do
-  entries <- selectList [] [Desc PasswordId]
-  liftIO $ print entries
+  entries <- map (passwordDetails . entityVal) <$> selectList [] [Desc PasswordId]
+  liftIO $ case entries of
+    [] -> putStrLn $ Theme.info "No stored passwords."
+    xs -> print xs
+  where
+    passwordDetails :: Password -> (Text, Text)
+    passwordDetails = (,) <$> passwordDomain <*> passwordUsername
