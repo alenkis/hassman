@@ -13,15 +13,13 @@ main = do
   migrateDb
   getCliCommand >>= \case
     Init -> do
-      mp <- getSensitiveData "Masterpass: "
-      storeMasterPassword mp
+      sk <- getSensitiveData "Secret key: "
+      storeSecretKey sk
     List -> listPasswords
     (Options domain username flag) -> do
-      masterPassword <- getSensitiveData "Password: "
-      isVerified <- verifyMasterPassword masterPassword
-      case isVerified of
+      getSensitiveData "Secret key: " >>= verifySecret >>= \case
         Missing -> error "Make sure to initialize with --init"
-        NonVerified -> error "Master password incorrect"
-        Verified _ -> case flag of
-          Create -> storePassword domain username
-          Copy   -> copyPassword domain username
+        NonVerified -> error "Secret key incorrect"
+        Verified secret -> case flag of
+          Create -> storePassword domain username secret
+          Copy   -> copyPassword domain username secret

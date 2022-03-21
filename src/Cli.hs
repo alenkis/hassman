@@ -2,7 +2,7 @@
 
 module Cli where
 
-import           Data.Text
+import           Data.Text                   (Text)
 import           Options.Applicative         (Parser, command, execParser, flag,
                                               fullDesc, header, help, helper,
                                               info, infoOption, long, metavar,
@@ -49,7 +49,7 @@ listPasswordsP :: Parser Input
 listPasswordsP = flag' List (short 'l' <> long "list" <> help "List all passwords")
 
 initP :: Parser Input
-initP = flag' Init (short 'i' <> long "init" <> help "Initialise hassman")
+initP = flag' Init (short 'i' <> long "init" <> help "Initialize Hassman by creating secret key.")
 
 input :: Parser Input
 input = optionsP <|> listPasswordsP <|> initP
